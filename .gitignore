@@ -19,4 +19,6 @@ x86/Debug/
 x86/Release/
 bin/
 obj/
-out/
+out/.DS_Store
+solar_system
+repomix-output.xml

@@ -124,6 +124,19 @@ void processInput(GLFWwindow* window)
     if (keyPressedOnce(window, GLFW_KEY_LEFT))  feedKonamiKey(GLFW_KEY_LEFT);
     if (keyPressedOnce(window, GLFW_KEY_RIGHT)) feedKonamiKey(GLFW_KEY_RIGHT);
     if (keyPressedOnce(window, GLFW_KEY_B))     feedKonamiKey(GLFW_KEY_B);
+    if (keyPressedOnce(window, GLFW_KEY_V) && videoActive()) videoStop();
+    if (keyPressedOnce(window, GLFW_KEY_F))
+    {
+        g_surfaceFx = !g_surfaceFx;
+        pushToast(g_surfaceFx ? "Craters and clouds: ON" : "Craters and clouds: OFF");
+    }
+    if (keyPressedOnce(window, GLFW_KEY_Y))
+    {
+        g_lightManual = false;
+        pushToast("Light: Sun");
+    }
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) { g_lightManual = true; g_lightAngle -= 60.0f * deltaTime; }
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) { g_lightManual = true; g_lightAngle += 60.0f * deltaTime; }
     if (keyPressedOnce(window, GLFW_KEY_A))     feedKonamiKey(GLFW_KEY_A);
 
     float speed = 8.0f * deltaTime;
@@ -350,6 +363,8 @@ void selectBody(int idx)
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+    if (videoHandleMouse(window, button, action)) return;
+
     if (action == GLFW_PRESS) cancelCinematic();
 
     if ((button == GLFW_MOUSE_BUTTON_LEFT || button == GLFW_MOUSE_BUTTON_RIGHT) && action == GLFW_PRESS)
@@ -468,4 +483,3 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
     }
 }
-

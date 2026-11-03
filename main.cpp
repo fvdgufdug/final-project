@@ -50,7 +50,8 @@ int main()
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    unsigned int prog = buildShaderProgram(vertexShaderSource, fragmentShaderSource);
+    unsigned int prog = loadShaderProgram("shaders/scene.vert", "shaders/scene.frag");
+    if (!prog) { glfwTerminate(); return -1; }
     glUseProgram(prog);
 
     int uModel = glGetUniformLocation(prog, "model");
@@ -91,26 +92,8 @@ int main()
     buildShootingStarLine(ssv);
     GpuMesh ssMesh = uploadVertexOnly(ssv, 3);
 
-    const char* vs2D = R"(
-#version 330 core
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec4 aColor;
-uniform mat4 uOrtho;
-uniform float uScale;
-out vec4 vColor;
-void main()
-{
-    vColor = aColor;
-    gl_Position = uOrtho * vec4(aPos.xy * uScale, 0.0, 1.0);
-}
-)";
-    const char* fs2D = R"(
-#version 330 core
-in vec4 vColor;
-out vec4 FragColor;
-void main() { FragColor = vColor; }
-)";
-    unsigned int uiProg = buildShaderProgram(vs2D, fs2D);
+    unsigned int uiProg = loadShaderProgram("shaders/ui.vert", "shaders/ui.frag");
+    if (!uiProg) { glfwTerminate(); return -1; }
     int uOrtho = glGetUniformLocation(uiProg, "uOrtho");
     int uUiScale = glGetUniformLocation(uiProg, "uScale");
 
@@ -324,6 +307,7 @@ void main() { FragColor = vColor; }
         }
 
         processInput(window);
+        videoUpdate(window, deltaTime);
 
         if (selectedBody >= 0 && selectedBody < (int)bodies.size() && bodies[selectedBody].destroyed && !cinematicActive)
         {
@@ -522,7 +506,8 @@ void main() { FragColor = vColor; }
         glUseProgram(prog);
         glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(uProjection, 1, GL_FALSE, glm::value_ptr(proj));
-        glUniform3f(uSunPos, 0, 0, 0);
+        glm::vec3 lightPos = lightPosition();
+        glUniform3f(uSunPos, lightPos.x, lightPos.y, lightPos.z);
 
         {
             glDisable(GL_CULL_FACE);
@@ -646,7 +631,7 @@ void main() { FragColor = vColor; }
                 glDepthMask(GL_TRUE);
             }
 
-            if (body.hasClouds)
+            if (body.hasClouds && g_surfaceFx)
             {
                 float hp = glm::clamp(body.health / 100.0f, 0.0f, 1.0f);
                 if (hp > 0.02f)
@@ -1433,6 +1418,7 @@ void main() { FragColor = vColor; }
                 "Q / E or click the bar - change weapon      C - cinematic camera",
                 "Arrows / middle-drag - orbit planet         Wheel - zoom",
                 "7 Earth-Mars crash   8 Jupiter star   9 Sun supernova   0 black hole",
+                "F - craters and clouds on/off      Z / X - rotate light      Y - light back to the Sun",
             };
             int lineCount = (int)(sizeof(helpLines) / sizeof(helpLines[0]));
 
@@ -1524,6 +1510,56 @@ void main() { FragColor = vColor; }
             glDisable(GL_BLEND);
         }
 
+        {
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glUseProgram(uiProg);
+            glm::mat4 orthoInfo = glm::ortho(0.0f, (float)fbW, (float)fbH, 0.0f, -1.0f, 1.0f);
+            glUniformMatrix4fv(uOrtho, 1, GL_FALSE, glm::value_ptr(orthoInfo));
+            glUniform1f(uUiScale, uiScale);
+
+            char infoBuf[160];
+            snprintf(infoBuf, sizeof(infoBuf), "%s  |  Team: %s", kProjectTitle, kTeamNames);
+            drawUiText(textVAO, textVBO, 20.0f, 20.0f, infoBuf, 200, 210, 235, 255);
+            float frameMs = (displayFps > 0.0f) ? 1000.0f / displayFps : 0.0f;
+            char lightBuf[48];
+            if (g_lightManual) snprintf(lightBuf, sizeof(lightBuf), "manual %.0f deg", fmodf(g_lightAngle + 3600.0f, 360.0f));
+            else snprintf(lightBuf, sizeof(lightBuf), "Sun");
+            snprintf(infoBuf, sizeof(infoBuf), "Craters+clouds [F]: %s   Light [Z/X/Y]: %s   Frame: %.1f ms",
+                g_surfaceFx ? "ON" : "OFF", lightBuf, frameMs);
+            drawUiText(textVAO, textVBO, 20.0f, 38.0f, infoBuf, g_surfaceFx ? 150 : 255, g_surfaceFx ? 220 : 150, g_surfaceFx ? 150 : 120, 255);
+
+            glEnable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
+        }
+
+        if (videoActive())
+        {
+            videoDraw(winW, winH);
+
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glUseProgram(uiProg);
+            glm::mat4 orthoVid = glm::ortho(0.0f, (float)fbW, (float)fbH, 0.0f, -1.0f, 1.0f);
+            glUniformMatrix4fv(uOrtho, 1, GL_FALSE, glm::value_ptr(orthoVid));
+            glUniform1f(uUiScale, uiScale);
+
+            VideoRect vr = videoRect();
+            drawUiRect(panelVAO, panelVBO, vr.x, vr.y, vr.w, vr.titleH, 15, 20, 35, 235);
+            drawUiText(textVAO, textVBO, vr.x + 8.0f, vr.y + 7.0f, "NEVER GONNA GIVE YOU UP", 190, 205, 230, 255);
+            drawUiRect(panelVAO, panelVBO, vr.x + vr.w - vr.titleH, vr.y, vr.titleH, vr.titleH, 150, 50, 50, 235);
+            drawUiText(textVAO, textVBO, vr.x + vr.w - vr.titleH + 7.0f, vr.y + 7.0f, "X", 255, 255, 255, 255);
+
+            glEnable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -1537,4 +1573,3 @@ void main() { FragColor = vColor; }
     glfwTerminate();
     return 0;
 }
-

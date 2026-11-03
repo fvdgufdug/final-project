@@ -1,4 +1,6 @@
 #include "Globals.h"
+#include <fstream>
+#include <sstream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -28,6 +30,34 @@ unsigned int buildShaderProgram(const char* vs, const char* fs)
     if (!ok) { glGetProgramInfoLog(p, 512, nullptr, log);std::cout << "Link err:\n" << log << "\n"; }
     glDeleteShader(v); glDeleteShader(f);
     return p;
+}
+
+
+
+unsigned int loadShaderProgram(const char* vsPath, const char* fsPath)
+{
+    auto readAll = [](const char* path, std::string& out) {
+        std::ifstream f(path, std::ios::binary);
+        if (!f) return false;
+        std::stringstream ss;
+        ss << f.rdbuf();
+        out = ss.str();
+        return !out.empty();
+    };
+    std::string vs, fs;
+    if (!readAll(vsPath, vs)) { std::cout << "Shader file missing or empty: " << vsPath << "\n"; return 0; }
+    if (!readAll(fsPath, fs)) { std::cout << "Shader file missing or empty: " << fsPath << "\n"; return 0; }
+    std::cout << "Compiling shaders: " << vsPath << ", " << fsPath << "\n";
+    return buildShaderProgram(vs.c_str(), fs.c_str());
+}
+
+
+
+glm::vec3 lightPosition()
+{
+    if (!g_lightManual) return glm::vec3(0.0f);
+    float a = glm::radians(g_lightAngle);
+    return glm::vec3(cosf(a) * 45.0f, 12.0f, sinf(a) * 45.0f);
 }
 
 
@@ -278,4 +308,3 @@ void showLoading(GLFWwindow* window, const char* message)
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
-

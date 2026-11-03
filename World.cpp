@@ -79,7 +79,7 @@ glm::vec3 jitterDir(const glm::vec3& d, float maxAngle)
 
 void uploadImpacts(const Body& b, int uCount, int uImp, int uAges)
 {
-    int n = (int)std::min(b.impacts.size(), (size_t)kMaxImpacts);
+    int n = g_surfaceFx ? (int)std::min(b.impacts.size(), (size_t)kMaxImpacts) : 0;
     float data[kMaxImpacts * 4];
     float ages[kMaxImpacts];
     for (int i = 0; i < n; ++i)
@@ -528,4 +528,3 @@ std::vector<glm::vec3> predictTrajectory(const glm::vec3& startPos, const glm::v
     }
     return path;
 }
-

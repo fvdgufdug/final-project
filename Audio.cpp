@@ -1,4 +1,5 @@
 #include "Globals.h"
+#include <deque>
 
 #if __has_include("miniaudio.h")
 #define MINIAUDIO_IMPLEMENTATION
@@ -26,6 +27,7 @@ ma_device               g_audioDevice;
 bool                    g_audioReady = false;
 bool                    g_audioMuted = false;
 std::mutex              g_audioMutex;
+std::deque<float>       g_videoAudio;
 std::vector<AudioVoice> g_audioVoices;
 unsigned int            g_audioNoiseSeed = 20260921u;
 
@@ -86,10 +88,24 @@ void audioDataCallback(ma_device* device, void* output, const void*, ma_uint32 f
             voice.age += 1.0f / sr;
         }
 
-        if (mix > 1.0f) mix = 1.0f;
-        if (mix < -1.0f) mix = -1.0f;
-        out[f * 2 + 0] = mix;
-        out[f * 2 + 1] = mix;
+        float left = mix, right = mix;
+        if (g_videoAudio.size() >= 2)
+        {
+            if (!g_audioMuted)
+            {
+                left += g_videoAudio[0];
+                right += g_videoAudio[1];
+            }
+            g_videoAudio.pop_front();
+            g_videoAudio.pop_front();
+        }
+
+        if (left > 1.0f) left = 1.0f;
+        if (left < -1.0f) left = -1.0f;
+        if (right > 1.0f) right = 1.0f;
+        if (right < -1.0f) right = -1.0f;
+        out[f * 2 + 0] = left;
+        out[f * 2 + 1] = right;
     }
 
     for (size_t v = 0; v < g_audioVoices.size(); )
@@ -138,6 +154,21 @@ void audioPushVoice(AudioVoice v)
     g_audioVoices.push_back(v);
 }
 
+void audioVideoPush(const float* interleaved, int frames)
+{
+    if (!g_audioReady) return;
+    std::lock_guard<std::mutex> lock(g_audioMutex);
+    const size_t limit = 44100 * 2 * 2;
+    for (int i = 0; i < frames * 2; ++i) g_videoAudio.push_back(interleaved[i]);
+    while (g_videoAudio.size() > limit) g_videoAudio.pop_front();
+}
+
+void audioVideoClear()
+{
+    std::lock_guard<std::mutex> lock(g_audioMutex);
+    g_videoAudio.clear();
+}
+
 void audioPlayLaser()      { AudioVoice v; v.kind = AudioVoice::SINE_SWEEP; v.freqStart = 1200.0f; v.freqEnd = 300.0f; v.amp = 0.35f; v.duration = 0.3f;  audioPushVoice(v); }
 void audioPlayLaunch()     { AudioVoice v; v.kind = AudioVoice::CLICK;      v.freqStart = 220.0f;  v.amp = 0.25f; v.duration = 0.12f; audioPushVoice(v); }
 void audioPlayCollision()  { AudioVoice v; v.kind = AudioVoice::CLICK;      v.freqStart = 90.0f;   v.amp = 0.30f; v.duration = 0.15f; audioPushVoice(v); }
@@ -163,6 +194,8 @@ void audioSetAmbient(bool enabled)
 #else
 
 bool g_audioMuted = false;
+void audioVideoPush(const float*, int) {}
+void audioVideoClear() {}
 void audioInit() {}
 void audioShutdown() {}
 void audioPlayLaser() {}
@@ -173,4 +206,3 @@ void audioPlayUiBlip() {}
 void audioSetAmbient(bool) {}
 
 #endif
-
