@@ -1,4 +1,4 @@
-# OpenGL Solar System Simulation
+       # OpenGL Solar System Simulation
 An interactive 3D Solar System simulation built with **modern OpenGL Core Profile 3.3**, **GLFW**, **GLAD**, **GLM**, and **stb_image**.
 This project demonstrates real-time 3D rendering, shader-based lighting, texture mapping, camera movement, reusable mesh generation, and hierarchical transformations such as planets orbiting the Sun and the Moon orbiting Earth.
 ---
