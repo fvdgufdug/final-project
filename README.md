@@ -1,175 +1,247 @@
-       # OpenGL Solar System Simulation
-An interactive 3D Solar System simulation built with **modern OpenGL Core Profile 3.3**, **GLFW**, **GLAD**, **GLM**, and **stb_image**.
-This project demonstrates real-time 3D rendering, shader-based lighting, texture mapping, camera movement, reusable mesh generation, and hierarchical transformations such as planets orbiting the Sun and the Moon orbiting Earth.
----
+# 3D Solar System Simulation
+
+An interactive Solar System simulation and space sandbox built with **C++20** and **OpenGL 3.3 Core Profile**. Explore the planets, follow their motion, change their physical properties, launch projectiles, and experiment with collisions and fictional space scenarios.
+
+The project combines real-time rendering, gravitational simulation, a custom interface, procedural sound, and interactive visual effects.
+
 ## Features
-### 3D Rendering
-- Uses the modern OpenGL rendering pipeline.
-- Uses custom vertex and fragment shaders.
-- Generates a procedural UV sphere mesh for planets, the Sun, the Moon, asteroids, and the star background.
-- Reuses one sphere mesh for multiple objects to improve efficiency.
-- Supports texture mapping using `stb_image`.
-- Uses per-fragment lighting with ambient and diffuse light.
-### Solar System Simulation
-- Renders the Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.
-- Each planet is defined using a data-driven `Body` structure.
-- Planets rotate on their own axes.
-- Planets revolve around the Sun.
-- Earth has a Moon that orbits relative to Earth’s position.
-- Saturn includes a custom ring mesh with a slight tilt.
-- Circular orbit paths are drawn to visualize planetary movement.
-### Additional Space Effects
-- A textured star background is rendered using a large skysphere.
-- An asteroid belt is generated using hundreds of small rotating asteroid objects.
-- Shooting stars are spawned randomly and rendered as fading line trails.
-- Loading messages are displayed in the window title while textures are being loaded.
-### Camera System
-The project uses a first-person style camera system.
-- Mouse movement controls yaw and pitch.
-- `W`, `A`, `S`, and `D` keys move the camera.
-- Camera movement uses delta time for smoother motion.
-- `TAB` toggles mouse capture on and off.
-- `ESC` closes the simulation window.
-### Transformations
-The simulation uses the standard 3D graphics transformation pipeline:
-```text
-Model → View → Projection
-```
-Each object uses a combination of:
-- Translation for orbit position.
-- Rotation for spin and movement.
-- Scaling for object size.
-### Projection
-- Uses a perspective projection camera.
-- Uses a dynamic aspect ratio based on the current framebuffer size.
-- Handles window resizing safely.
----
-## Technologies Used
-- C++
-- OpenGL 3.3 Core Profile
-- GLFW
-- GLAD
-- GLM
-- stb_image
-- Visual Studio
----
+
+### Solar System and Rendering
+
+- Textured Sun, all eight planets, and Earth's Moon.
+- Planet rotation, Saturn's rings, a star background, an asteroid belt, and shooting stars.
+- Reusable procedural sphere and ring meshes.
+- Custom GLSL shaders with ambient and diffuse lighting.
+- Atmospheric effects, procedural Earth clouds, and impact marks with fading glow.
+- Orbital trails and a trajectory preview for slingshot launches.
+- Adjustable lighting for observing planetary surfaces.
+
+### Physics and Interaction
+
+- Pairwise gravitational attraction between active simulation bodies.
+- Velocity Verlet integration with physics substeps.
+- Collision detection, damage, debris, explosions, and black-hole absorption.
+- Editable mass and size for the selected body.
+- Pause, adjustable simulation speed, and scene reset.
+- Free camera, planet focus, orbit controls, an automatic tour, and cinematic event views.
+
+### Sandbox Tools
+
+- Five selectable weapons: **Nuke, Missiles, Asteroid, Laser, and Planet Killer**.
+- Launchable projectiles, rockets, and black holes.
+- A battle station that can attack a selected planet.
+- Four preset scenarios: Earth–Mars collision, Jupiter ignition, solar supernova, and a rogue black hole.
+- Three save slots for the Sun and planets.
+- Planet information panels, health and population indicators, help, and notifications.
+- Procedural sound effects, ambient audio, and a hidden video Easter egg.
+
+> This is an educational graphics project and a creative sandbox. Sizes, distances, time, and physical behavior are simplified. Destruction, star ignition, and supernova scenarios are fictional demonstrations, not scientific predictions.
+
+## Technologies
+
+| Technology | Purpose |
+| --- | --- |
+| C++20 | Application logic and simulation |
+| OpenGL 3.3 / GLSL | Rendering and shader effects |
+| GLFW | Window creation and keyboard/mouse input |
+| GLAD | OpenGL function loading |
+| GLM | Vector, matrix, and transformation mathematics |
+| stb_image | Texture loading |
+| stb_easy_font | Interface text |
+| miniaudio | Audio output and procedural sound |
+| pl_mpeg | MPEG video playback for the Easter egg |
+| Visual Studio / MSVC | Included Windows project configuration |
+
+Dependency headers and a Windows GLFW static library are included in the repository.
+
 ## Getting Started
-### 1. Clone the Repository
+
+### Requirements
+
+- Windows with Visual Studio and the **Desktop development with C++** workload.
+- A Windows SDK and a C++20-capable MSVC toolset.
+- A graphics driver supporting **OpenGL 3.3 Core Profile** or newer.
+- Git, or a downloaded ZIP of the repository.
+
+The included project requests platform toolset **v145**. If it is unavailable, select a compatible installed toolset in the project properties.
+
+### 1. Download the Project
+
 ```bash
-git clone https://github.com/xbze3/solar-system-simulation-opengl
+git clone https://github.com/fvdgufdug/final-project.git
+cd final-project
 ```
-### 2. Open the Project
-1. Navigate to the project folder.
-2. Open the Visual Studio solution file (`.slnx`).
-3. Make sure the project is selected as the startup project.
+
+Alternatively, choose **Code → Download ZIP** on GitHub and extract the archive.
+
+### 2. Open and Configure Visual Studio
+
+Open `helloWorldGLFW.vcxproj` from the repository root. A solution file is not included; Visual Studio can open the project directly.
+
+**The checked-in project needs configuration before its first build:** it contains machine-specific include paths and currently lists only `main.cpp` and `glad.c` as compilation units.
+
+1. Select an **x64** configuration. If Visual Studio reports duplicate configuration entries, use **Configuration Manager** to keep one valid `Debug|x64` entry; the project XML currently contains a duplicate.
+2. In **Solution Explorer → Source Files → Add → Existing Item**, add:
+
+   ```text
+   Audio.cpp
+   Easter.cpp
+   Input.cpp
+   Render.cpp
+   SaveLoad.cpp
+   Scenario.cpp
+   UI.cpp
+   Weapons.cpp
+   World.cpp
+   ```
+
+   Keep `main.cpp` and `glad.c` in the project. Compile each source file once.
+
+3. In **Project Properties**, apply the following settings to the configuration you will build:
+
+   | Setting | Value |
+   | --- | --- |
+   | C/C++ → General → Additional Include Directories | `$(ProjectDir)libraries\include;%(AdditionalIncludeDirectories)` |
+   | C/C++ → Language → C++ Language Standard | ISO C++20 |
+   | Linker → General → Additional Library Directories | `$(ProjectDir)libraries\lib;%(AdditionalLibraryDirectories)` |
+   | Linker → Input → Additional Dependencies | `opengl32.lib;glfw3.lib;%(AdditionalDependencies)` |
+   | Debugging → Working Directory | `$(ProjectDir)` |
+
+4. Remove obsolete absolute paths from **VC++ Directories** and any remaining configuration-specific include settings. Preserve inherited system paths.
+
+Use the Windows SDK's `windows.h` and the MSVC runtime's `direct.h` on Windows. The repository also contains small compatibility headers with those names; do not add the repository root as a global include directory that overrides the system headers.
+
 ### 3. Build and Run
-1. Select either **Debug** or **Release** mode.
-2. Click **Local Windows Debugger** or press **F5**.
-3. The simulation window should open and display the Solar System.
----
-## Dependencies
-All required dependencies are included locally in the project:
-- **GLFW** - window creation and input handling.
-- **GLAD** - OpenGL function loading.
-- **GLM** - vector and matrix mathematics.
-- **stb_image** - texture loading.
-No additional dependency installation should be required if the project is opened and built in Visual Studio with the included files.
----
-## Required Assets
-The project uses texture files stored in the `textures` folder. These include textures for:
-- Stars
-- Sun
-- Mercury
-- Venus
-- Earth
-- Mars
-- Jupiter
-- Saturn
-- Uranus
-- Neptune
-- Moon
-- Asteroid
-Make sure the `textures` folder remains in the correct location relative to the project files.
----
+
+Build the project, then press **F5** or **Ctrl+F5**. The application opens fullscreen on the primary monitor.
+
+At startup, `main.cpp` changes the working directory to `./helloWorldGLFW`. Keep the asset folder in place and launch with the repository root as the working directory.
+
 ## Controls
-| Key / Input | Action                |
-| ----------- | --------------------- |
-| `W`         | Move forward          |
-| `S`         | Move backward         |
-| `A`         | Move left             |
-| `D`         | Move right            |
-| Mouse       | Look around           |
-| `TAB`       | Toggle cursor capture |
-| `ESC`       | Exit the simulation   |
----
-## Implementation Highlights
-### Data-Driven Planet System
-Planets are stored using a `Body` structure:
-```cpp
-struct Body {
-    std::string  name;
-    float        scaledSize;
-    float        orbitRadius;
-    float        rotationSpeed;
-    float        revolutionSpeed;
-    glm::vec3    fallbackColor;
-    unsigned int texture;
-};
-```
-This makes it easier to add or modify planets without rewriting the rendering logic.
-### Reusable Mesh Strategy
-A single UV sphere mesh is generated once and reused for the Sun, planets, Moon, asteroids, and skysphere. This reduces duplicated geometry and keeps the rendering system cleaner.
-### Orbit Mechanics
-Each planet’s position is calculated using circular motion:
-```cpp
-x = cos(angle) * orbitRadius;
-z = sin(angle) * orbitRadius;
-```
-The angle changes over time based on each planet’s revolution speed.
-### Moon System
-The Moon’s position is calculated relative to Earth’s current position. This demonstrates hierarchical transformation because the Moon’s motion depends on the movement of another object.
-### Saturn Ring
-Saturn’s ring is generated using a custom ring mesh with an inner and outer radius. It is rendered separately from Saturn and tilted slightly to create a more realistic visual effect.
-### Asteroid Belt
-The asteroid belt is generated using a collection of asteroid objects. Each asteroid has its own orbit radius, orbit angle, speed, size, and vertical offset.
-### Shooting Stars
-Shooting stars are spawned randomly around the scene. Each shooting star has a start position, direction, speed, trail length, lifetime, and fading effect.
-### Orbit Visualization
-Circular line loops are used to display each planet’s orbital path around the Sun.
----
-## Notes
-- The simulation is designed for learning and demonstration purposes.
-- Planet sizes, distances, and speeds are visually scaled and are not scientifically accurate.
-- The project focuses on graphics programming concepts such as lighting, transformation, texture mapping, and camera control.
----
+
+### Camera and Navigation
+
+| Input | Action |
+| --- | --- |
+| `W`, `A`, `S`, `D` | Move the free camera |
+| Mouse movement | Look around when the cursor is captured |
+| `Tab` | Toggle captured mouse / visible cursor |
+| Mouse wheel | Change field of view, or zoom toward/away from a selected body |
+| Left-click a body or sidebar entry with the cursor visible | Select and focus a body |
+| Arrow keys | Orbit the selected body |
+| Middle-button drag with the cursor visible | Orbit the selected body |
+| Right-click with the cursor visible | Cancel slingshot charging and leave the selected-body view |
+| `T` | Toggle the automatic planet tour |
+| `C` | Enable or disable cinematic event views |
+| `Esc` | Exit |
+
+### Simulation and Display
+
+| Key | Action |
+| --- | --- |
+| `P` | Pause / resume physics |
+| `=` / `+` or numpad `+` | Increase simulation speed, up to 8× |
+| `-` or numpad `-` | Decrease simulation speed, down to 0× |
+| `R` | Reset the scene |
+| `[` / `]` | Decrease / increase the selected body's mass |
+| `,` / `.` | Decrease / increase the selected body's size |
+| `F` | Toggle crater and cloud effects |
+| Hold `Z` / `X` | Rotate the manual light source |
+| `Y` | Restore lighting from the Sun |
+| `H` | Show / hide help |
+| `M` | Mute / unmute audio |
+
+### Weapons and Projectiles
+
+| Input | Action |
+| --- | --- |
+| `Q` / `E` | Select the previous / next weapon |
+| Click a weapon button with the cursor visible | Choose a weapon |
+| Left-click the surface of an already selected body | Fire the selected weapon |
+| Left-click with the mouse captured, without hitting a selected body | Launch a projectile |
+| Right-click with the mouse captured | Launch a rocket |
+| Middle-click with the mouse captured | Launch a black hole |
+| Left-drag empty space with the cursor visible, then release | Aim and launch a slingshot projectile |
+| `K` | Fire the battle station at the selected planet |
+
+### Scenarios and Saves
+
+| Key | Action |
+| --- | --- |
+| `7` | Put Earth and Mars on a collision course |
+| `8` | Ignite Jupiter in a fictional star scenario |
+| `9` | Trigger the solar supernova scenario |
+| `0` | Introduce a rogue black hole |
+| `1`, `2`, `3` | Choose the active save slot |
+| `O` | Save to the active slot |
+| `L` | Load the active slot |
+
+Save files are written as `save_slot_1.txt`, `save_slot_2.txt`, and `save_slot_3.txt` in `helloWorldGLFW/` when launched as described above. Saving overwrites the chosen slot.
+
+The save format stores the first nine bodies—the Sun and eight planets—including mass, position, velocity, size, destruction state, health, population, star flags, and impacts. It is not a complete session snapshot: camera settings, spawned projectiles, debris, and all temporary effects are not saved.
+
+## Suggested Demo
+
+1. Launch the application and press `H` to view help.
+2. Press `T` for a tour of the Solar System, then press it again to stop.
+3. Press `Tab`, select Earth in the sidebar, and use the wheel and arrow keys to inspect it.
+4. Use `[` / `]` to change its mass and observe the simulation.
+5. Press `1`, then `O` to save the current planetary state.
+6. Press `7` to start the Earth–Mars collision scenario, or select a weapon and click the selected planet's surface.
+7. Press `R` to restore the initial scene, or `L` to load the selected save slot.
+
+## Project Structure
+
+| File or Directory | Responsibility |
+| --- | --- |
+| `main.cpp` | Initialization, asset loading, main loop, scene rendering, and much of the interface |
+| `Globals.h` | Shared structures, simulation state, constants, and function declarations |
+| `Render.cpp` | Shader loading, textures, mesh generation, and drawing helpers |
+| `World.cpp` | Gravity, integration, collisions, projectiles, debris, and trajectory prediction |
+| `Input.cpp` | Keyboard and mouse input, camera controls, picking, and slingshot interaction |
+| `Weapons.cpp` | Weapon strikes, impact damage, and delayed attacks |
+| `Scenario.cpp` | Preset sandbox scenarios |
+| `SaveLoad.cpp` | Save-slot paths and planetary-state serialization |
+| `Audio.cpp` | Procedural audio and video audio output |
+| `Easter.cpp` | Hidden video playback and its controls |
+| `UI.cpp` | Toast notification helper |
+| `helloWorldGLFW/shaders/` | Scene, interface, and video shaders |
+| `helloWorldGLFW/textures/` | Planet, Moon, asteroid, ring, and background textures |
+| `libraries/` | Bundled graphics headers and GLFW library |
+| `helloWorldGLFW.vcxproj` | Visual Studio project |
+
+## Implementation Notes
+
+**Rendering:** Objects use model, view, and perspective projection matrices. A shared UV sphere mesh is reused across celestial bodies; Saturn's rings use a separate ring mesh. The scene shader combines texture color with ambient and diffuse lighting, procedural clouds, and impact effects.
+
+**Physics:** Active bodies interact through softened pairwise gravity. Positions and velocities are updated using velocity Verlet integration. Large frame time steps are split into smaller physics steps. The Moon follows a separate scripted orbit around Earth rather than participating as an independent gravitational body.
+
+**Selection:** Mouse coordinates are transformed into a world-space ray. Ray–sphere intersection identifies bodies, while the sidebar offers direct selection.
+
+**Trajectory preview:** Slingshot aiming predicts a path using a copy of the simulation state and a massless test body.
+
 ## Troubleshooting
-### The project does not open
-- Make sure you open the `.slnx` file in Visual Studio.
-- Ensure that the full project folder was downloaded or cloned.
-### Textures are missing or appear white
-- Check that the `textures` folder exists.
-- Make sure the texture file names match the names used in the source code.
-- Keep the texture folder in the expected project directory.
-### The build fails
-- Rebuild the solution in Visual Studio.
-- Make sure the project is using a compatible C++ compiler.
-- Confirm that GLFW, GLAD, GLM, and stb_image are included correctly.
-### The window opens but nothing displays
-- Ensure your computer supports OpenGL 3.3 or higher.
-- Update your graphics drivers if necessary.
-- Try running the project in Release mode.
----
-## Future Improvements
-Possible improvements include:
-- Add more realistic planetary scaling.
-- Add elliptical orbits.
-- Add zoom controls.
-- Add labels for planets.
-- Add more moons for other planets.
-- Add improved lighting effects.
-- Add a user interface for controlling simulation speed.
-- Add sound effects or background music.
----
-## License
-This project is intended for educational use.
-,
+
+| Problem | What to check |
+| --- | --- |
+| Toolset `v145` is missing | Install the requested toolset or retarget the project to a compatible installed one. |
+| GLFW, GLAD, or GLM headers cannot be found | Replace machine-specific paths with `$(ProjectDir)libraries\include`. |
+| Unresolved project functions during linking | Add all nine additional `.cpp` modules listed in the setup instructions. |
+| `glfw3.lib` cannot be found or is incompatible | Check the library directory and that the library matches the target architecture and compiler settings. |
+| Shaders cannot be opened or textures are missing | Set the working directory to the repository root and preserve `helloWorldGLFW/shaders/` and `helloWorldGLFW/textures/`. |
+| Windows build reports `unistd.h` errors | Check that the local compatibility headers are not shadowing Windows/MSVC headers. |
+| Camera movement seems constrained | Stop the tour and leave the selected-body view using right-click with the cursor visible. |
+| The simulation appears frozen | Press `P` and increase the speed if it is set to 0×. |
+| A save does not restore every object | Save slots contain the nine main bodies, not the complete sandbox session. |
+
+## Easter Egg
+
+Enter `Up, Up, Down, Down, Left, Right, Left, Right, B, A` to open the hidden video player. Press `V` or use its close button to stop playback. It reads `helloWorldGLFW/nevergonna.mpg`; the included MP4 is not the playback input.
+
+## Team
+
+**Miras · Bainazar · Tileukhan**
+
+## Acknowledgements
+
+The earlier project documentation references [solar-system-simulation-opengl](https://github.com/xbze3/solar-system-simulation-opengl). This repository also uses GLFW, GLAD, GLM, stb, miniaudio, and pl_mpeg. Consult their respective notices and licenses when reusing third-party components.
