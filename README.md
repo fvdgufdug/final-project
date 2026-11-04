@@ -242,6 +242,4 @@ Enter `Up, Up, Down, Down, Left, Right, Left, Right, B, A` to open the hidden vi
 
 **Miras · Bainazar · Tileukhan**
 
-## Acknowledgements
 
-The earlier project documentation references [solar-system-simulation-opengl](https://github.com/xbze3/solar-system-simulation-opengl). This repository also uses GLFW, GLAD, GLM, stb, miniaudio, and pl_mpeg. Consult their respective notices and licenses when reusing third-party components.
