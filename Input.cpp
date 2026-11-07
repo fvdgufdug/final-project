@@ -197,7 +197,7 @@ void processInput(GLFWwindow* window)
     if (d3Now && !digit3PressedLastFrame) { activeSaveSlot = 3; pushToast("Save slot 3 selected"); }
     digit3PressedLastFrame = d3Now;
 
-    bool hNow = (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS);
+    bool hNow = (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS);
     if (hNow && !hPressedLastFrame) helpVisible = !helpVisible;
     hPressedLastFrame = hNow;
 
