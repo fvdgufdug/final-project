@@ -1354,7 +1354,7 @@ int main()
             char statBuf[64];
             float sx = (winW > 0 ? (float)winW - 190.0f : 20.0f);
             snprintf(statBuf, sizeof(statBuf), "FPS: %.0f", displayFps);
-            drawUiText(textVAO, textVBO, sx, (float)winH - 66.0f, statBuf, 150, 220, 150, 255);
+            drawUiText(textVAO, textVBO, sx, (float)winH - 66.0f, statBuf, displayFps < 30.0f ? 255 : 150, displayFps < 30.0f ? 80 : 220, displayFps < 30.0f ? 80 : 150, 255);
             snprintf(statBuf, sizeof(statBuf), "Collisions: %d", statsCollisions);
             drawUiText(textVAO, textVBO, sx, (float)winH - 48.0f, statBuf, 190, 190, 210, 255);
             snprintf(statBuf, sizeof(statBuf), "Destroyed: %d", statsDestroyed);
