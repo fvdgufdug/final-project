@@ -156,7 +156,7 @@ void processInput(GLFWwindow* window)
     tabPressedLastFrame = tabNow;
 
     bool pNow = (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
-    if (pNow && !pPressedLastFrame) paused = !paused;
+    if (pNow && !pPressedLastFrame) { paused = !paused; pushToast(paused ? "Simulation PAUSED" : "Simulation RESUMED"); }
     pPressedLastFrame = pNow;
 
     if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS)
