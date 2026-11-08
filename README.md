@@ -148,7 +148,7 @@ At startup, `main.cpp` changes the working directory to `./helloWorldGLFW`. Keep
 | `F` | Toggle crater and cloud effects |
 | Hold `Z` / `X` | Rotate the manual light source |
 | `Y` | Restore lighting from the Sun |
-| `H` | Show / hide help |
+| `H` / `F1` | Show / hide help |
 | `M` | Mute / unmute audio |
 
 ### Weapons and Projectiles
@@ -182,7 +182,7 @@ The save format stores the first nine bodies—the Sun and eight planets—inclu
 
 ## Suggested Demo
 
-1. Launch the application and press `H` to view help.
+1. Launch the application and press `H`/`F1` to view help.
 2. Press `T` for a tour of the Solar System, then press it again to stop.
 3. Press `Tab`, select Earth in the sidebar, and use the wheel and arrow keys to inspect it.
 4. Use `[` / `]` to change its mass and observe the simulation.
