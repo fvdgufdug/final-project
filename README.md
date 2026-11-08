@@ -15,6 +15,8 @@ The project combines real-time rendering, gravitational simulation, a custom int
 - Atmospheric effects, procedural Earth clouds, and impact marks with fading glow.
 - Orbital trails and a trajectory preview for slingshot launches.
 - Adjustable lighting for observing planetary surfaces.
+- On-screen FPS counter that turns red when the frame rate drops below 30 FPS.
+- Built-in benchmark (`F9`) that compares FPS with the craters-and-clouds technique ON and OFF.
 
 ### Physics and Interaction
 
@@ -149,6 +151,7 @@ At startup, `main.cpp` changes the working directory to `./helloWorldGLFW`. Keep
 | Hold `Z` / `X` | Rotate the manual light source |
 | `Y` | Restore lighting from the Sun |
 | `H` / `F1` | Show / hide help |
+| `F9` | Run the automatic FPS benchmark; results go to the console, the screen and `helloWorldGLFW/benchmark_results.txt` |
 | `M` | Mute / unmute audio |
 
 ### Weapons and Projectiles
@@ -205,6 +208,7 @@ The save format stores the first nine bodies—the Sun and eight planets—inclu
 | `Audio.cpp` | Procedural audio and video audio output |
 | `Easter.cpp` | Hidden video playback and its controls |
 | `UI.cpp` | Toast notification helper |
+| `Benchmark.cpp` | Automatic FPS benchmark (technique ON vs OFF) and its on-screen status text |
 | `helloWorldGLFW/shaders/` | Scene, interface, and video shaders |
 | `helloWorldGLFW/textures/` | Planet, Moon, asteroid, ring, and background textures |
 | `libraries/` | Bundled graphics headers and GLFW library |

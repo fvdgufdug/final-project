@@ -1420,6 +1420,7 @@ int main()
                 "Arrows / middle-drag - orbit planet         Wheel - zoom",
                 "7 Earth-Mars crash   8 Jupiter star   9 Sun supernova   0 black hole",
                 "F - craters and clouds on/off      Z / X - rotate light      Y - light back to the Sun",
+                "F9 - FPS benchmark (technique ON vs OFF)",
             };
             int lineCount = (int)(sizeof(helpLines) / sizeof(helpLines[0]));
 
