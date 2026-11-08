@@ -307,6 +307,7 @@ int main()
         }
 
         processInput(window);
+        benchmarkUpdate();
         videoUpdate(window, deltaTime);
 
         if (selectedBody >= 0 && selectedBody < (int)bodies.size() && bodies[selectedBody].destroyed && !cinematicActive)
@@ -1531,6 +1532,7 @@ int main()
             snprintf(infoBuf, sizeof(infoBuf), "Craters+clouds [F]: %s   Light [Z/X/Y]: %s   Frame: %.1f ms",
                 g_surfaceFx ? "ON" : "OFF", lightBuf, frameMs);
             drawUiText(textVAO, textVBO, 20.0f, 38.0f, infoBuf, g_surfaceFx ? 150 : 255, g_surfaceFx ? 220 : 150, g_surfaceFx ? 150 : 120, 255);
+            if (benchmarkActive()) drawUiText(textVAO, textVBO, 20.0f, 74.0f, benchmarkStatusText().c_str(), 255, 120, 120, 255);
 
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);

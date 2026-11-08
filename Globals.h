@@ -339,6 +339,10 @@ void audioVideoClear();
 
 extern bool g_audioMuted;
 void pushToast(const std::string& text);
+bool benchmarkActive();
+void benchmarkStart();
+void benchmarkUpdate();
+std::string benchmarkStatusText();
 bool keyPressedOnce(GLFWwindow* w, int key);
 void triggerKonamiEasterEgg();
 void feedKonamiKey(int key);

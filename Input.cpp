@@ -125,6 +125,7 @@ void processInput(GLFWwindow* window)
     if (keyPressedOnce(window, GLFW_KEY_RIGHT)) feedKonamiKey(GLFW_KEY_RIGHT);
     if (keyPressedOnce(window, GLFW_KEY_B))     feedKonamiKey(GLFW_KEY_B);
     if (keyPressedOnce(window, GLFW_KEY_V) && videoActive()) videoStop();
+    if (keyPressedOnce(window, GLFW_KEY_F9)) benchmarkStart();
     if (keyPressedOnce(window, GLFW_KEY_F))
     {
         g_surfaceFx = !g_surfaceFx;
