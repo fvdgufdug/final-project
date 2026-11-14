@@ -1,0 +1,12 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.debugConfig": {
+    "cwd": "${workspaceFolder}"
+  },
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "code-runner.executorMap": {
+    "cpp": "cd \"$workspaceRoot\" && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build --config Debug --target run --parallel 4"
+  },
+  "code-runner.runInTerminal": true,
+  "cmake.cmakePath": "cmake"
+}

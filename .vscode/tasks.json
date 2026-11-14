@@ -1,0 +1,78 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Configure Solar System",
+      "type": "process",
+      "command": "cmake",
+      "args": [
+        "-S",
+        "${workspaceFolder}",
+        "-B",
+        "${workspaceFolder}/build",
+        "-DCMAKE_BUILD_TYPE=Debug"
+      ],
+      "problemMatcher": [],
+      "osx": {
+        "options": {
+          "env": {
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:${env:PATH}"
+          }
+        }
+      }
+    },
+    {
+      "label": "Build Solar System",
+      "type": "process",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceFolder}/build",
+        "--parallel",
+        "4",
+        "--config",
+        "Debug"
+      ],
+      "dependsOn": "Configure Solar System",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "osx": {
+        "options": {
+          "env": {
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:${env:PATH}"
+          }
+        }
+      }
+    },
+    {
+      "label": "Run Solar System",
+      "type": "process",
+      "command": "cmake",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "Build Solar System",
+      "problemMatcher": [],
+      "osx": {
+        "options": {
+          "env": {
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:${env:PATH}"
+          }
+        }
+      },
+      "args": [
+        "--build",
+        "${workspaceFolder}/build",
+        "--config",
+        "Debug",
+        "--target",
+        "run"
+      ]
+    }
+  ]
+}

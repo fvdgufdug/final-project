@@ -23,3 +23,4 @@ out/.DS_Store
 solar_system
 repomix-output.xml
 helloWorldGLFW/benchmark_results.txt
+build/

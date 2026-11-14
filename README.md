@@ -58,6 +58,41 @@ Dependency headers and a Windows GLFW static library are included in the reposit
 
 ## Getting Started
 
+### VS Code: macOS and Windows (CMake)
+
+Open the whole repository folder in VS Code, not just `main.cpp`.
+Use **Terminal → Run Task → Run Solar System**. This configures CMake,
+builds all source files, and starts the app with the correct asset directory.
+**Terminal → Run Build Task** builds without starting the app.
+
+Prerequisites:
+
+- macOS: Xcode Command Line Tools (`xcode-select --install`) and CMake
+  (`brew install cmake`). Installing GLFW (`brew install glfw`) avoids downloading it at configure time.
+  The VS Code tasks include Homebrew paths for both Apple Silicon and Intel Macs.
+- Windows: CMake and Git on PATH, and Visual Studio 2022 or newer Build Tools
+  with **Desktop development with C++** and a Windows SDK. VS Code is the editor;
+  the Build Tools provide the compiler. Use a graphics driver supporting OpenGL 3.3.
+
+If GLFW is not installed, CMake downloads GLFW 3.4 from its official repository
+and compiles it for the current platform. Internet access is needed for that first build.
+The bundled Windows `.lib` is not used by this CMake build.
+
+The same terminal commands work on macOS and Windows:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --config Debug --parallel 4
+cmake --build build --config Debug --target run
+```
+
+The executable is in `build/bin/`. Start it through the `run` target or with
+the repository root as the working directory. Do not copy `build/` between
+operating systems; build separately on each machine.
+
+Local validation: compiled and launched on Apple Silicon macOS. Windows
+configuration is provided but has not been executed on a Windows machine.
+
 ### Requirements
 
 - Windows with Visual Studio and the **Desktop development with C++** workload.
